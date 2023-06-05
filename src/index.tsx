@@ -98,6 +98,7 @@ export type VideoProps = VideoProperties & {
   children?: any;
   onPostProgress?: (data: OnProgressData) => void;
   onPostSeek?: (data: OnSeekData) => void;
+  onVidStart?: () => void;
 };
 export type VideoPlayerRef = {
   /**
@@ -166,6 +167,7 @@ const VideoPlayer = forwardRef<VideoPlayerRef, VideoProps>(
       children,
       onPostProgress,
       onPostSeek,
+      onVidStart,
       ...rest
     },
     ref,
@@ -657,6 +659,7 @@ const VideoPlayer = forwardRef<VideoPlayerRef, VideoProps>(
       max.value = data?.duration;
       setIsLoading(false);
       setControlTimeout();
+      onVidStart();
     };
     const onEnd = () => {
       setIsLoadEnd(true);
@@ -694,7 +697,7 @@ const VideoPlayer = forwardRef<VideoPlayerRef, VideoProps>(
      *
      * @param {object} data The video meta data
      */
-     const onProgress = (data: OnProgressData) => {
+    const onProgress = (data: OnProgressData) => {
       const { currentTime: cTime } = data;
       if (!isScrubbing.value) {
         if (!isSeeking.current) {
@@ -830,11 +833,6 @@ const VideoPlayer = forwardRef<VideoPlayerRef, VideoProps>(
     const gesture = Gesture.Race(onPanGesture, taps);
     return (
       <>
-        <StatusBar
-          barStyle={'light-content'}
-          translucent
-          backgroundColor={'#000'}
-        />
         <GestureDetector gesture={gesture}>
           <Animated.View style={[styles.container, videoStyle, style]}>
             <Video
